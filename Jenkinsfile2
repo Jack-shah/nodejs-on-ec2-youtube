@@ -1,0 +1,47 @@
+pipeline {
+    agent {
+        docker{
+            image 'awajid3/npmnodegit:1.0.0'
+            args '-u root -v /var/run/docker.sock:/var/run/docker.sock -p 18000:18000'
+        }
+    }
+    stages {
+        stage('check prerequisites') {
+            steps {
+                sh '''
+                npm -v
+                node -v
+                '''
+            }
+        }
+        stage('checkout the project code') {
+            steps {
+    
+                git branch: 'master', changelog: false, poll: false, url: 'https://github.com/Jack-shah/nodejs-on-ec2-youtube.git'
+                sh '''
+                pwd
+                ls -a
+                '''
+            }
+        }
+    stage('install dependecies') {
+      // this step can be skipped  here because this project does not require externel dependencies......
+            steps {
+                sh '''
+                pwd
+                ls -a
+                npm install
+                '''
+            }
+        }
+    stage('Build') {
+            steps {
+                sh '''
+                 pwd
+                 # npm run build    This   step also can be skipped  as  there are no scripts defined in package.json            
+                 node index.js                             
+                 '''
+            }
+        }
+    }
+}
